@@ -37,3 +37,4 @@ def add_user(users: list) -> None:
 
 add_user(data_of_users)
 read(data_of_users)
+
