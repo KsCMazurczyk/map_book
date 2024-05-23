@@ -4,7 +4,7 @@
 data_of_users: list = [
     {'name': 'Julia', 'Surname': 'Szklarzi', 'posts': 5, 'location': 'Hajnówka'},
     {'name': 'Norbi', 'Surname': 'Szeli', 'posts': 3, 'location': 'Rzeszów'},
-    {'name': 'Kacper', 'Surname': 'Chujcik', 'posts': 0, 'location': 'Legnica'},
+    {'name': 'Kacper', 'Surname': 'Wójcik', 'posts': 0, 'location': 'Legnica'},
     {'name': 'Seba', 'Surname': 'Dudek', 'posts': 10, 'location': 'Siedlce'},
 ]
 print(f'Witaj {data_of_users[0]['name']}')
@@ -45,8 +45,30 @@ def delete_user(users: list) -> None:
     """
     name: str = input("Who to remove:")
     for user in users:
-        if user ["name"]==name:
+        if user["name"] == name:
             users.remove(user)
+
 
 # delete_user(data_of_users)
 # read(data_of_users)
+def update_user(users: list) -> None:
+    """
+    update a user from a users list
+    :param users:
+    :return:
+    """
+    name: str = input("Enter name to of user to be modified: ")
+    for user in users:
+        if user["name"] == name:
+            new_name: str = input("Enter new name: ")
+            new_surname: str = input("Enter new surname: ")
+            new_posts: int = int(input("Enter new posts number: "))
+            new_location: str = input("Enter new location: ")
+            user["name"] = new_name
+            user["Surname"] = new_surname
+            user["posts"] = new_posts
+            user["location"] = new_location
+
+
+update_user(data_of_users)
+read(data_of_users)
