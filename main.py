@@ -28,10 +28,10 @@ def add_user(users: list) -> None:
     :return: None
     """
     name: str = input("Enter your name:")
-    Surname: str = input("Enter your Surnname:")
+    surname: str = input("Enter your Surnname:")
     posts: int = int(input("Enter your posts number:"))
     location: str = input("Enter your location:")
-    new_user: dict = {'name': name, 'Surname': Surname, 'posts': posts, 'location': location}
+    new_user: dict = {'name': name, 'Surname': surname, 'posts': posts, 'location': location}
     users.append(new_user)
 
 
@@ -65,7 +65,7 @@ def update_user(users: list) -> None:
             new_posts: int = int(input("Enter new posts number: "))
             new_location: str = input("Enter new location: ")
             user["name"] = new_name
-            user["Surname"] = new_surname
+            user["surname"] = new_surname
             user["posts"] = new_posts
             user["location"] = new_location
 
