@@ -1,6 +1,89 @@
+import string
 from tkinter import *
 import tkintermapview
+import requests
+from bs4 import BeautifulSoup
 
+users: list = []
+
+class User:
+    def __init__(self, name,surname,posts,location):
+        self.name = name
+        self.surname = surname
+        self.posts = posts
+        self.location = location
+        self.coords = self.get_coordinates()
+        self.marker = map_widget.set_marker(self.coords[0], self.coords[1])
+    def get_coordinates(self):
+        url: str = f'https://pl.wikipedia.org/wiki/{self.location}'
+        response = requests.get(url)
+        response_html = BeautifulSoup(response.text, 'html.parser')
+        response_html_lat = float( response_html.select('.latitude')[1].text.replace(',', '.'))
+        response_html_lng = float (response_html.select('.longitude')[1].text.replace(',', '.'))
+        print ([response_html_lat, response_html_lng])
+        return [response_html_lat, response_html_lng]
+
+def add_user():
+    name: str = entry_name.get()
+    surname: str = entry_surname.get()
+    posts: str = entry_posts.get()
+    location: str = entry_location.get()
+    #new_user: dict = {'name': name, 'surname': surname, 'posts': posts, 'location': location}
+    new_user = User(name, surname, posts, location)
+    users.append(new_user)
+    show_users()
+    entry_name.delete(0, END)
+    entry_surname.delete(0, END)
+    entry_posts.delete(0, END)
+    entry_location.delete(0, END)
+
+    entry_name.focus()
+
+def user_details():
+    i = listbox_lista_obiektow.index(ACTIVE)
+    label_name_szczegoly_obiektu_wartosc.config(text=users[i].name)
+    label_surname_szczegoly_obiektu_wartosc.config(text=users[i].surname)
+    label_posts_szczegoly_obiektu_wartosc.config(text=users[i].posts)
+    label_location_szczegoly_obiektu_wartosc.config(text=users[i].location)
+    map_widget.set_position(users[i].coords[0], users[i].coords[1])
+    map_widget.set_zoom(12)
+
+def remove_user():
+    i = listbox_lista_obiektow.index(ACTIVE)
+    users[i].marker.delete()
+    users.pop(i)
+    show_users()
+
+def show_users():
+    listbox_lista_obiektow.delete(0, END)
+    for idx,user in enumerate(users):
+        listbox_lista_obiektow.insert(idx, f'{user.name} {user.surname}')
+
+
+def edit_users():
+    i = listbox_lista_obiektow.index(ACTIVE)
+    print(users[i])
+    entry_name.insert(0, users[i].name)
+    entry_surname.insert(0, users[i].surname)
+    entry_posts.insert(0, users[i].posts)
+    entry_location.insert(0, users[i].location)
+    button_dodaj_obiekt.config(text = 'Zapisz zmiany', command = lambda: update_users(i))
+
+def update_users(i):
+    users[i].namev= entry_name.get()
+    users[i].surname = entry_surname.get()
+    users[i].posts = entry_posts.get()
+    users[i].location = entry_location.get()
+    button_dodaj_obiekt.config(text='Dodaj', command= add_user)
+    show_users()
+    users[i].marker.delete()
+    users[i].coords = User.get_coordinates(users[i])
+    users[i].marker = map_widget.set_marker(users[i].coords[0], users[i].coords[1])
+    entry_name.delete(0, END)
+    entry_surname.delete(0, END)
+    entry_posts.delete(0, END)
+    entry_location.delete(0, END)
+    entry_name.focus()
 
 
 root = Tk()
@@ -20,9 +103,9 @@ ramka_mapa.grid(row=2, column=0, columnspan=8)
 #ramka_lista_obiektow
 label_lista_obiektow = Label(ramka_lista_obiektow,text="Lista obiektów:")
 listbox_lista_obiektow = Listbox(ramka_lista_obiektow)
-button_pokaz_szczegoly = Button(ramka_lista_obiektow, text='Pokaż szczegóły')
-button_usun_obiekt = Button(ramka_lista_obiektow, text='Usuń obiekt')
-button_edytuj_obiekt = Button(ramka_lista_obiektow, text='Edytuj obiekt')
+button_pokaz_szczegoly = Button(ramka_lista_obiektow, text='Pokaż szczegóły', command = user_details)
+button_usun_obiekt = Button(ramka_lista_obiektow, text='Usuń obiekt',command = remove_user)
+button_edytuj_obiekt = Button(ramka_lista_obiektow, text='Edytuj obiekt', command = edit_users)
 
 label_lista_obiektow.grid(row=0, column=0, columnspan=3)
 listbox_lista_obiektow.grid(row=1, column=0, columnspan=3)
@@ -42,7 +125,7 @@ entry_surname = Entry(ramka_formularzy)
 entry_posts = Entry(ramka_formularzy)
 entry_location = Entry(ramka_formularzy)
 
-button_dodaj_obiekt = Button(ramka_formularzy, text='Dodaj użytkownika')
+button_dodaj_obiekt = Button(ramka_formularzy, text='Dodaj użytkownika', command=add_user)
 
 label_formularz.grid(row=0, column=0, columnspan=2)
 label_name.grid(row=1, column=0, sticky=W)
